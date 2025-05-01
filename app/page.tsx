@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 
+// Aquí puedes definir el tipo de datos de tu PDF
 type PDFData = {
   buissnessName: string;
   buissnessStreet: string;
@@ -10,37 +11,26 @@ type PDFData = {
   clientStreet: string;
   clientCity: string;
   clientPostal: string;
+  clientPhone: string;
+  clientEmail: string;
   date?: string;
 };
 
-type UserData = {
-  name: string;
-  email: string;
-};
+const MyComponent = () => {
+  // Inicializamos el estado permitiendo que pdfData sea null
+  const [pdfData, setPdfData] = useState<PDFData | null>(null);
 
-const YourComponent = () => {
-  const [pdfData, setPdfData] = useState<PDFData | undefined>(undefined); // Usa undefined en lugar de null
-  const [userData, setUserData] = useState<UserData | undefined>(undefined); // Estado para los datos del usuario
-
-  // Función para actualizar los datos del PDF y del usuario
-  const updateData = (pdf: PDFData, user: UserData) => {
-    setPdfData(pdf);
-    setUserData(user);
-  };
-
-  // Función que maneja la generación del PDF
+  // Función que genera el PDF
   const generatePDF = async () => {
-    if (!pdfData || !userData) {
-      console.error("Datos incompletos: es necesario tener pdfData y userData.");
+    // Verificación para asegurarse de que pdfData no sea null
+    if (!pdfData) {
+      console.error("Error: Los datos del PDF no están completos.");
       return;
     }
 
     try {
-      // Mostrar los datos del usuario antes de generar el PDF
-      console.log(`Generando PDF para el usuario: ${userData.name}, Email: ${userData.email}`);
-      
-      // Generación del PDF (aquí podrías integrar la librería de PDF que usas)
-      const blob = await pdf(<PDFDocument data={pdfData} />).toBlob(); // Reemplazar con tu librería de PDF
+      // Aquí, pdfData es seguro para usar
+      const blob = await pdf(<PDFDocument data={pdfData} />).toBlob();
       const blobUrl = URL.createObjectURL(blob);
       window.open(blobUrl, "_blank");
     } catch (error) {
@@ -56,40 +46,24 @@ const YourComponent = () => {
       >
         Generar PDF
       </button>
-
-      {/* Ejemplo de botón para actualizar los datos */}
-      <button
-        onClick={() =>
-          updateData(
-            {
-              buissnessName: 'Mi Empresa',
-              buissnessStreet: 'Calle Ficticia 123',
-              buissnessCity: 'Ciudad Ejemplo',
-              buissnessPostal: '12345',
-              buissnessPhone: '555-1234',
-              clientName: 'Cliente Ejemplo',
-              clientStreet: 'Calle Cliente 456',
-              clientCity: 'Ciudad Cliente',
-              clientPostal: '67890',
-              date: '2025-05-01'
-            },
-            { name: 'Juan Pérez', email: 'juan@example.com' }
-          )
-        }
-      >
-        Actualizar Datos
-      </button>
-
-      {/* Mostrar los datos del usuario */}
-      {userData && (
-        <div>
-          <h3>Datos del Usuario:</h3>
-          <p>Nombre: {userData.name}</p>
-          <p>Email: {userData.email}</p>
-        </div>
-      )}
     </div>
   );
 };
 
-export default YourComponent;
+// Asegúrate de tener tu componente PDFDocument correctamente definido
+const PDFDocument: React.FC<{ data: PDFData }> = ({ data }) => {
+  return (
+    <div>
+      <h1>{data.buissnessName}</h1>
+      <p>{data.buissnessStreet}, {data.buissnessCity} {data.buissnessPostal}</p>
+      <p>{data.buissnessPhone}</p>
+      <h2>Cliente: {data.clientName}</h2>
+      <p>{data.clientStreet}, {data.clientCity} {data.clientPostal}</p>
+      <p>{data.clientPhone}</p>
+      <p>{data.clientEmail}</p>
+      {data.date && <p>Fecha: {data.date}</p>}
+    </div>
+  );
+};
+
+export default MyComponent;
