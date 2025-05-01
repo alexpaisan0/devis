@@ -150,7 +150,10 @@ export default function Home() {
 
   const [pdfData, setPdfData] = React.useState<z.infer<typeof formSchema> | null>(null);
 
-  const handleGenerate = (values: z.infer<typeof formSchema>) => {
+  const handleGenerate = async (values: z.infer<typeof formSchema>) => {
+    const blob = await pdf(<PDFDocument data={values} />).toBlob();
+    const blobUrl = URL.createObjectURL(blob);
+    window.open(blobUrl, "_blank"); 
     setPdfData(values);
   };
 
