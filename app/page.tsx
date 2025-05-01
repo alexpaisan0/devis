@@ -27,10 +27,8 @@ const formSchema = z.object({
 type FormData = z.infer<typeof formSchema>;
 
 const PDFDocument = ({ data }: { data: FormData }) => {
-  // Aquí va la lógica para renderizar el PDF con los datos proporcionados
   return (
     <div>
-      {/* El contenido del PDF debe usar `data` */}
       <h1>{data.buissnessName}</h1>
       {/* Resto del contenido basado en los datos */}
     </div>
@@ -58,7 +56,7 @@ const App = () => {
   });
 
   const handleGenerate = async () => {
-    // Validar que pdfData no sea null ni undefined
+    // Verificar que pdfData no sea null
     if (pdfData) {
       const blob = await pdf(<PDFDocument data={pdfData} />).toBlob();
       const blobUrl = URL.createObjectURL(blob);
@@ -84,7 +82,6 @@ const App = () => {
     <div>
       <h1>Formulario para Generar PDF</h1>
       <form onSubmit={handleSubmit}>
-        {/* Aquí tus campos de formulario */}
         <input
           type="text"
           placeholder="Business Name"
@@ -97,7 +94,7 @@ const App = () => {
           value={pdfData.buissnessStreet}
           onChange={(e) => setPdfData({ ...pdfData, buissnessStreet: e.target.value })}
         />
-        {/* Continúa con los demás campos de formulario */}
+        {/* Otros campos de formulario */}
         
         <button type="submit">Generar PDF</button>
       </form>
