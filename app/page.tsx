@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-// Tipo de datos para el PDF
+// Tipo de datos para el PDF (sin nulls)
 type PDFData = {
   buissnessName: string;
   buissnessStreet: string;
@@ -16,30 +16,29 @@ type PDFData = {
   date?: string;
 };
 
-// Valor por defecto en caso de que no haya datos
+// Valor predeterminado sin valores null
 const defaultPDFData: PDFData = {
-  buissnessName: '',
-  buissnessStreet: '',
-  buissnessCity: '',
-  buissnessPostal: '',
-  buissnessPhone: '',
-  clientName: '',
-  clientStreet: '',
-  clientCity: '',
-  clientPostal: '',
-  clientPhone: '',
-  clientEmail: '',
-  date: ''
+  buissnessName: 'Empresa Ejemplo',
+  buissnessStreet: 'Calle Ficticia 123',
+  buissnessCity: 'Ciudad Ejemplo',
+  buissnessPostal: '12345',
+  buissnessPhone: '123-456-7890',
+  clientName: 'Cliente Ejemplo',
+  clientStreet: 'Avenida Ficticia 456',
+  clientCity: 'Ciudad Ejemplo',
+  clientPostal: '67890',
+  clientPhone: '098-765-4321',
+  clientEmail: 'cliente@ejemplo.com',
+  date: '2025-05-01',
 };
 
 const MyComponent = () => {
-  // Asegúrate de que pdfData siempre tenga un valor válido
+  // Aquí estamos inicializando con datos predeterminados
   const [pdfData, setPdfData] = useState<PDFData>(defaultPDFData);
 
   // Función para generar el PDF
   const generatePDF = async () => {
     try {
-      // Pasa pdfData al componente PDFDocument
       const blob = await pdf(<PDFDocument data={pdfData} />).toBlob();
       const blobUrl = URL.createObjectURL(blob);
       window.open(blobUrl, "_blank");
