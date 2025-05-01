@@ -1,178 +1,108 @@
-"use client";
+'use client';
 
-import React from "react";
-import { PDFDownloadLink, pdf, PDFViewer, Page, Text, View, Document, StyleSheet, Image as PDFImage } from "@react-pdf/renderer";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
-import Image from "next/image";
-import Logo from "@/public/logo.png";  // Este es el cambio que se hace, ya no lo usamos directamente en el PDF
-import { Button } from "@/components/ui/button";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import React, { useState } from 'react';
+import { pdf } from '@react-pdf/renderer';
+import { z } from 'zod';
 
-// Esquema de validación
+// Definición del esquema
 const formSchema = z.object({
-  businessName: z.string().nonempty(),  // Cambié buissnessName a businessName
-  businessStreet: z.string().nonempty(), // Cambié buissnessStreet a businessStreet
-  businessCity: z.string().nonempty(),  // Cambié buissnessCity a businessCity
-  businessPostal: z.string().nonempty(),  // Cambié buissnessPostal a businessPostal
-  businessPhone: z.string().nonempty(), // Cambié buissnessPhone a businessPhone
-
-  clientName: z.string().nonempty(),
-  clientStreet: z.string().nonempty(),
-  clientCity: z.string().nonempty(),
-  clientPostal: z.string().nonempty(),
-  clientPhone: z.string().nonempty(),
-
-  description: z.string().nonempty(),
-  job: z.string().nonempty(),
-  price: z.string().nonempty(),
-
+  buissnessName: z.string().min(1, "Business name is required"),
+  buissnessStreet: z.string().min(1, "Street is required"),
+  buissnessCity: z.string().min(1, "City is required"),
+  buissnessPostal: z.string().min(1, "Postal code is required"),
+  buissnessPhone: z.string().min(1, "Phone number is required"),
+  clientName: z.string().min(1, "Client name is required"),
+  clientStreet: z.string().min(1, "Client street is required"),
+  clientCity: z.string().min(1, "Client city is required"),
+  clientPostal: z.string().min(1, "Client postal code is required"),
+  description: z.string().min(1, "Description is required"),
+  job: z.string().min(1, "Job title is required"),
+  price: z.string().min(1, "Price is required"),
   note: z.string().optional(),
   conditions: z.string().optional(),
   signature: z.string().optional(),
   date: z.string().optional(),
 });
 
-// Estilos del PDF
-const styles = StyleSheet.create({
-  page: {
-    padding: 30,
-    fontSize: 12,
-    fontFamily: 'Helvetica'
-  },
-  section: {
-    marginBottom: 10,
-  },
-  bold: {
-    fontWeight: "bold",
-  },
-  title: {
-    fontSize: 18,
-    textAlign: "center",
-    marginBottom: 20,
-  },
-  row: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginBottom: 10,
-  },
-  label: {
-    fontWeight: "bold",
-  },
-});
+type FormData = z.infer<typeof formSchema>;
 
-// Componente PDF
-function PDFDocument({ data }: { data: z.infer<typeof formSchema> }) {
+const PDFDocument = ({ data }: { data: FormData }) => {
+  // Aquí va la lógica para renderizar el PDF con los datos proporcionados
   return (
-    <Document>
-      <Page size="A4" style={styles.page}>
-        {/* Si necesitas mostrar el logo, puedes convertirlo en base64 */}
-        <PDFImage src={Logo.src} style={{ width: 100 }} />
-        <Text style={styles.title}>DEVIS</Text>
-
-        <View style={styles.row}>
-          <View style={{ width: "45%" }}>
-            <Text style={styles.bold}>contractant:</Text>
-            <Text>{data.businessName}</Text>
-            <Text>{`${data.businessStreet}, ${data.businessCity} (${data.businessPostal})`}</Text>
-            <Text>{`Téléphone: ${data.businessPhone}`}</Text>
-          </View>
-          <View style={{ width: "45%" }}>
-            <Text style={styles.bold}>Client:</Text>
-            <Text>{data.clientName}</Text>
-            <Text>{`${data.clientStreet}, ${data.clientCity} (${data.clientPostal})`}</Text>
-            <Text>{`Téléphone: ${data.clientPhone}`}</Text>
-          </View>
-        </View>
-
-        <View style={styles.section}>
-          <Text style={styles.bold}>Description du travail:</Text>
-          <Text>{data.job}</Text>
-        </View>
-
-        <View style={styles.section}>
-          <Text style={styles.bold}>Détails:</Text>
-          <Text>{data.description}</Text>
-        </View>
-
-        <View style={styles.section}>
-          <Text style={styles.bold}>Total à payer:</Text>
-          <Text>{data.price} €</Text>
-        </View>
-
-        {data.note && (
-          <View style={styles.section}>
-            <Text style={styles.bold}>Note:</Text>
-            <Text>{data.note}</Text>
-          </View>
-        )}
-
-        {data.conditions && (
-          <View style={styles.section}>
-            <Text style={styles.bold}>Conditions:</Text>
-            <Text>{data.conditions}</Text>
-          </View>
-        )}
-
-        <View style={styles.section}>
-          <Text style={styles.bold}>Date:</Text>
-          <Text>{data.date || "_________"}</Text>
-        </View>
-        <View style={styles.section}>
-          <Text style={styles.bold}>Signature:</Text>
-          <Text>{data.signature || "_________"}</Text>
-        </View>
-      </Page>
-    </Document>
+    <div>
+      {/* El contenido del PDF debe usar `data` */}
+      <h1>{data.buissnessName}</h1>
+      {/* Resto del contenido basado en los datos */}
+    </div>
   );
-}
+};
 
-export default function Home() {
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      businessCity: "",
-      businessName: "",
-      businessPhone: "",
-      businessPostal: "",
-      businessStreet: "",
-      clientCity: "",
-      clientName: "",
-      clientPhone: "",
-      clientPostal: "",
-      clientStreet: "",
-      description: "",
-      job: "",
-      price: "",
-      note: "",
-      conditions: "",
-      signature: "",
-      date: "",
-    },
+const App = () => {
+  const [pdfData, setPdfData] = useState<FormData>({
+    buissnessName: '',
+    buissnessStreet: '',
+    buissnessCity: '',
+    buissnessPostal: '',
+    buissnessPhone: '',
+    clientName: '',
+    clientStreet: '',
+    clientCity: '',
+    clientPostal: '',
+    description: '',
+    job: '',
+    price: '',
+    note: '',
+    conditions: '',
+    signature: '',
+    date: '',
   });
 
-  const [pdfData, setPdfData] = React.useState<z.infer<typeof formSchema> | null>(null);
+  const handleGenerate = async () => {
+    // Validar que pdfData no sea null ni undefined
+    if (pdfData) {
+      const blob = await pdf(<PDFDocument data={pdfData} />).toBlob();
+      const blobUrl = URL.createObjectURL(blob);
+      window.open(blobUrl, "_blank");
+    } else {
+      console.error('No data available for PDF generation');
+    }
+  };
 
-  const handleGenerate = async (values: z.infer<typeof formSchema>) => {
-    const blob = await pdf(<PDFDocument data={values} />).toBlob();
-    const blobUrl = URL.createObjectURL(blob);
-    window.open(blobUrl, "_blank");
-    setPdfData(values);
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    // Validar que los datos sean correctos según el esquema de zod
+    const result = formSchema.safeParse(pdfData);
+    if (result.success) {
+      handleGenerate();
+    } else {
+      // Aquí puedes manejar los errores de validación
+      console.error(result.error.format());
+    }
   };
 
   return (
     <div>
-      <div className="grid grid-rows-[20px_1fr_20px] bg-gray-100 items-center p-8 pb-20 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-        <div>
-          <h1 className="text-6xl font-bold text-center ">DEVIS</h1>
-        </div>
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(handleGenerate)}>
-            {/* Formulario aquí */}
-          </form>
-        </Form>
-      </div>
+      <h1>Formulario para Generar PDF</h1>
+      <form onSubmit={handleSubmit}>
+        {/* Aquí tus campos de formulario */}
+        <input
+          type="text"
+          placeholder="Business Name"
+          value={pdfData.buissnessName}
+          onChange={(e) => setPdfData({ ...pdfData, buissnessName: e.target.value })}
+        />
+        <input
+          type="text"
+          placeholder="Business Street"
+          value={pdfData.buissnessStreet}
+          onChange={(e) => setPdfData({ ...pdfData, buissnessStreet: e.target.value })}
+        />
+        {/* Continúa con los demás campos de formulario */}
+        
+        <button type="submit">Generar PDF</button>
+      </form>
     </div>
   );
-}
+};
+
+export default App;
