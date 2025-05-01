@@ -1,103 +1,389 @@
+"use client";
+
+import React from "react";
+import { PDFDownloadLink, pdf, PDFViewer, Page, Text, View, Document, StyleSheet, Image as PDFImage } from "@react-pdf/renderer";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
 import Image from "next/image";
+import Logo from "@/public/logo.png";
+import { Button } from "@/components/ui/button";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+
+const formSchema = z.object({
+  buissnessName: z.string().nonempty(),
+  buissnessStreet: z.string().nonempty(),
+  buissnessCity: z.string().nonempty(),
+  buissnessPostal: z.string().nonempty(),
+  buissnessPhone: z.string().nonempty(),
+
+  clientName: z.string().nonempty(),
+  clientStreet: z.string().nonempty(),
+  clientCity: z.string().nonempty(),
+  clientPostal: z.string().nonempty(),
+  clientPhone: z.string().nonempty(),
+
+  description: z.string().nonempty(),
+  job: z.string().nonempty(),
+  price: z.string().nonempty(),
+
+  note: z.string().optional(),
+  conditions: z.string().optional(),
+  signature: z.string().optional(),
+  date: z.string().optional(),
+});
+
+const styles = StyleSheet.create({
+  page: {
+    padding: 30,
+    fontSize: 12,
+    fontFamily: 'Helvetica'
+  },
+  section: {
+    marginBottom: 10,
+  },
+  bold: {
+    fontWeight: "bold",
+  },
+  title: {
+    fontSize: 18,
+    textAlign: "center",
+    marginBottom: 20,
+  },
+  row: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 10,
+  },
+  label: {
+    fontWeight: "bold",
+  },
+});
+
+function PDFDocument({ data }: { data: z.infer<typeof formSchema> }) {
+  return (
+    <Document>
+      <Page size="A4" style={styles.page}>
+        <PDFImage src={Logo.src} style={{ width: 100 }} />
+        <Text style={styles.title}>DEVIS</Text>
+
+        <View style={styles.row}>
+          <View style={{ width: "45%" }}>
+            <Text style={styles.bold}>contractant:</Text>
+            <Text>{data.buissnessName}</Text>
+            <Text>{`${data.buissnessStreet}, ${data.buissnessCity} (${data.buissnessPostal})`}</Text>
+            <Text>{`Téléphone: ${data.buissnessPhone}`}</Text>
+          </View>
+          <View style={{ width: "45%" }}>
+            <Text style={styles.bold}>Client:</Text>
+            <Text>{data.clientName}</Text>
+            <Text>{`${data.clientStreet}, ${data.clientCity} (${data.clientPostal})`}</Text>
+            <Text>{`Téléphone: ${data.clientPhone}`}</Text>
+          </View>
+        </View>
+
+        <View style={styles.section}>
+          <Text style={styles.bold}>Description du travail:</Text>
+          <Text>{data.job}</Text>
+        </View>
+
+        <View style={styles.section}>
+          <Text style={styles.bold}>Détails:</Text>
+          <Text>{data.description}</Text>
+        </View>
+
+        <View style={styles.section}>
+          <Text style={styles.bold}>Total à payer:</Text>
+          <Text>{data.price} €</Text>
+        </View>
+
+        {data.note && (
+          <View style={styles.section}>
+            <Text style={styles.bold}>Note:</Text>
+            <Text>{data.note}</Text>
+          </View>
+        )}
+
+        {data.conditions && (
+          <View style={styles.section}>
+            <Text style={styles.bold}>Conditions:</Text>
+            <Text>{data.conditions}</Text>
+          </View>
+        )}
+
+        <View style={styles.section}>
+          <Text style={styles.bold}>Date:</Text>
+          <Text>{data.date || "_________"}</Text>
+        </View>
+        <View style={styles.section}>
+          <Text style={styles.bold}>Signature:</Text>
+          <Text>{data.signature || "_________"}</Text>
+        </View>
+      </Page>
+    </Document>
+  );
+}
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      buissnessCity: "",
+      buissnessName: "",
+      buissnessPhone: "",
+      buissnessPostal: "",
+      buissnessStreet: "",
+      clientCity: "",
+      clientName: "",
+      clientPhone: "",
+      clientPostal: "",
+      clientStreet: "",
+      description: "",
+      job: "",
+      price: "",
+      note: "",
+      conditions: "",
+      signature: "",
+      date: "",
+    },
+  });
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+  const [pdfData, setPdfData] = React.useState<z.infer<typeof formSchema> | null>(null);
+
+  const handleGenerate = (values: z.infer<typeof formSchema>) => {
+    setPdfData(values);
+  };
+
+  return (
+    <div>
+      <div className="grid grid-rows-[20px_1fr_20px] bg-gray-100 items-center p-8 pb-20 sm:p-20 font-[family-name:var(--font-geist-sans)]">
+          <Image src={Logo} alt="logo" className="w-40"/>
+          <div>
+            <h1 className="text-6xl font-bold text-center ">DEVIS</h1> 
+          </div>
+          
+          <div className="">
+            <h3></h3>
+          </div>
+          
+            
+            
+          <div>
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(handleGenerate)} className="">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 bg-white p-8 shadow-md rounded-lg">
+                  <div className="space-y-8 rounded-lg border-2 border-gray-200 p-8">
+                    <h2 className="text-4xl font-semibold">Informations de l'entreprise</h2>
+                    <FormField control={form.control} name="buissnessName" render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Nom de l'entreprise</FormLabel>
+                        <FormControl className="w-1/3 border-1 border-gray-200 rounded-xs p-1">
+                          <input placeholder="Nom" {...field} />
+                        </FormControl>
+                        <FormMessage/>
+                      </FormItem>
+                    )}
+                    />
+                    <FormField control={form.control} name="buissnessStreet" render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Rue de l'entrepris</FormLabel>
+                        <FormControl className="w-1/3  border-1 border-gray-200 rounded-xs p-1">
+                          <input placeholder="Rue" {...field} />
+                        </FormControl>
+                        <FormMessage/>
+                      </FormItem>
+                    )}
+                    />
+                    <FormField control={form.control} name="buissnessCity" render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Ville de l'entrepris</FormLabel>
+                        <FormControl className="w-1/3  border-1 border-gray-200 rounded-xs p-1">
+                          <input placeholder="Ville" {...field} />
+                        </FormControl>
+                        <FormMessage/>
+                      </FormItem>
+                    )}
+                    />
+                    <FormField control={form.control} name="buissnessPostal" render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Code postal de l'entreprise</FormLabel>
+                        <FormControl className="w-1/3  border-1 border-gray-200 rounded-xs p-1">
+                          <input placeholder="Code postal" {...field} />
+                        </FormControl>
+                        <FormMessage/>
+                      </FormItem>
+                    )}
+                    />
+                    <FormField control={form.control} name="buissnessPhone" render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Téléphone de contractante</FormLabel>
+                        <FormControl className="w-1/3  border-1 border-gray-200 rounded-xs p-1">
+                          <input placeholder="Téléphone d'entreprise" {...field} />
+                        </FormControl>
+                        <FormMessage/>
+                      </FormItem>
+                    )}
+                    />
+                  </div>
+                  <div className="space-y-8  rounded-lg border-2 border-gray-200 p-8">
+                    <h2 className="text-4xl font-semibold">Informations du client</h2>
+                    <FormField control={form.control} name="clientName" render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Nombre de client</FormLabel>
+                        <FormControl className="w-1/3  border-1 border-gray-200 rounded-xs p-1">
+                          <input placeholder="Nombre" {...field} />
+                        </FormControl>
+                        <FormMessage/>
+                      </FormItem>
+                    )}
+                    />
+                    <FormField control={form.control} name="clientStreet" render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Rue de client</FormLabel>
+                        <FormControl className="w-1/3  border-1 border-gray-200 rounded-xs p-1">
+                          <input placeholder="Rue" {...field} />
+                        </FormControl>
+                        <FormMessage/>
+                      </FormItem>
+                    )}
+                    />
+                    <FormField control={form.control} name="clientCity" render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Ville du client</FormLabel>
+                        <FormControl className="w-1/3  border-1 border-gray-200 rounded-xs p-1">
+                          <input placeholder="Ville" {...field} />
+                        </FormControl>
+                        <FormMessage/>
+                      </FormItem>
+                    )}
+                    />
+                    <FormField control={form.control} name="clientPostal" render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Code postal du client</FormLabel>
+                        <FormControl className="w-1/3  border-1 border-gray-200 rounded-xs p-1">
+                          <input placeholder="Code postal" {...field} />
+                        </FormControl>
+                        <FormMessage/>
+                      </FormItem>
+                    )}
+                    />
+                    <FormField control={form.control} name="clientPhone" render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Téléphone du client</FormLabel>
+                        <FormControl className="w-1/3  border-1 border-gray-200 rounded-xs p-1">
+                          <input placeholder="Téléphone" {...field} />
+                        </FormControl>
+                        <FormMessage/>
+                      </FormItem>
+                    )}
+                    />
+                  </div>
+                  <div className="col-span-2 space-y-8 rounded-lg border-2 border-gray-200 p-8">
+                    <h2 className="text-4xl font-semibold">Description</h2>
+                    <div className="grid grid-cols-2 gap-8">
+
+                      <div className="space-y-8">
+                        <FormField control={form.control} name="description" render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Travail</FormLabel>
+                            <FormControl className="border-1 border-gray-200 rounded-xs p-1">
+                              <textarea placeholder="travail" className="resize-none h-auto" rows={3} {...field} />
+                            </FormControl>
+                            <FormMessage/>
+                          </FormItem>
+                        )} />
+                         
+                        <FormField control={form.control} name="job" render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Description du travail</FormLabel>
+                            <FormControl className="border-1 border-gray-200 rounded-xs p-1">
+                              <textarea placeholder="Description" className="resize-none h-auto" rows={3} {...field} />
+                            </FormControl>
+                            <FormMessage/>
+                          </FormItem>
+                        )} />
+T
+                        <FormField control={form.control} name="price" render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Total à payer</FormLabel>
+                            <FormControl className="border-1 border-gray-200 rounded-xs p-1">
+                              <input placeholder="0.00€" {...field} />
+                            </FormControl>
+                            <FormMessage/>
+                          </FormItem>
+                        )} />
+                      </div>
+
+
+                      <div className="space-y-8">
+                        <FormField control={form.control} name="note" render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Note</FormLabel>
+                            <FormControl className="border-1 border-gray-200 rounded-xs p-1">
+                              <textarea placeholder="Note" className="resize-none h-auto" rows={3} {...field} />
+                            </FormControl>
+                            <FormMessage/>
+                          </FormItem>
+                        )} />
+
+                        <FormField control={form.control} name="conditions" render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Conditions</FormLabel>
+                            <FormControl className="border-1 border-gray-200 rounded-xs p-1">
+                              <textarea placeholder="Conditions" className="resize-none h-auto" rows={3} {...field} />
+                            </FormControl>
+                            <FormMessage/>
+                          </FormItem>
+                        )} />
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="col-span-2 space-y-8 rounded-lg">
+                    <div className="grid grid-cols-2 gap-8">
+                      <FormField control={form.control} name="signature" render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Signature</FormLabel>
+                          <FormControl className=" border-1 border-gray-200 rounded-xs p-1">
+                            <input placeholder="Nom, Prénom" {...field} />
+                          </FormControl>
+                          <FormMessage/>
+                        </FormItem>
+                      )} />
+
+                      <FormField control={form.control} name="date" render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Date</FormLabel>
+                          <FormControl className="w-1/4 border-1 border-gray-200 rounded-xs p-1">
+                            <input type="date" placeholder="Date" {...field} />
+                          </FormControl>
+                          <FormMessage/>
+                        </FormItem>
+                      )} />
+                    </div>
+                  </div>
+
+                    <div className="mt-6 col-span-2">
+                      <Button
+                        type="submit"
+                        className="bg-blue-500 text-white rounded-md p-2 hover:bg-blue-600 w-full"
+                        onClick={async () => {
+                          const blob = await pdf(<PDFDocument data={pdfData} />).toBlob();
+                          const blobUrl = URL.createObjectURL(blob);
+                          window.open(blobUrl, "_blank");
+                        }}
+                      >
+                        Télécharger le devis
+                      </Button>
+                    </div>                        
+                </div>
+              </form>
+            </Form>
+            
+          </div>
+      </div>
     </div>
+  
   );
+
 }
