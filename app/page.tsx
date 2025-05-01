@@ -1,105 +1,95 @@
-'use client';
-
 import React, { useState } from 'react';
-import { pdf } from '@react-pdf/renderer';
-import { z } from 'zod';
 
-// Definición del esquema
-const formSchema = z.object({
-  buissnessName: z.string().min(1, "Business name is required"),
-  buissnessStreet: z.string().min(1, "Street is required"),
-  buissnessCity: z.string().min(1, "City is required"),
-  buissnessPostal: z.string().min(1, "Postal code is required"),
-  buissnessPhone: z.string().min(1, "Phone number is required"),
-  clientName: z.string().min(1, "Client name is required"),
-  clientStreet: z.string().min(1, "Client street is required"),
-  clientCity: z.string().min(1, "Client city is required"),
-  clientPostal: z.string().min(1, "Client postal code is required"),
-  description: z.string().min(1, "Description is required"),
-  job: z.string().min(1, "Job title is required"),
-  price: z.string().min(1, "Price is required"),
-  note: z.string().optional(),
-  conditions: z.string().optional(),
-  signature: z.string().optional(),
-  date: z.string().optional(),
-});
-
-type FormData = z.infer<typeof formSchema>;
-
-const PDFDocument = ({ data }: { data: FormData }) => {
-  return (
-    <div>
-      <h1>{data.buissnessName}</h1>
-      {/* Resto del contenido basado en los datos */}
-    </div>
-  );
+type PDFData = {
+  buissnessName: string;
+  buissnessStreet: string;
+  buissnessCity: string;
+  buissnessPostal: string;
+  buissnessPhone: string;
+  clientName: string;
+  clientStreet: string;
+  clientCity: string;
+  clientPostal: string;
+  date?: string;
 };
 
-const App = () => {
-  const [pdfData, setPdfData] = useState<FormData>({
-    buissnessName: '',
-    buissnessStreet: '',
-    buissnessCity: '',
-    buissnessPostal: '',
-    buissnessPhone: '',
-    clientName: '',
-    clientStreet: '',
-    clientCity: '',
-    clientPostal: '',
-    description: '',
-    job: '',
-    price: '',
-    note: '',
-    conditions: '',
-    signature: '',
-    date: '',
-  });
+type UserData = {
+  name: string;
+  email: string;
+};
 
-  const handleGenerate = async () => {
-    // Verificar que pdfData no sea null
-    if (pdfData) {
-      const blob = await pdf(<PDFDocument data={pdfData} />).toBlob();
+const YourComponent = () => {
+  const [pdfData, setPdfData] = useState<PDFData | undefined>(undefined); // Usa undefined en lugar de null
+  const [userData, setUserData] = useState<UserData | undefined>(undefined); // Estado para los datos del usuario
+
+  // Función para actualizar los datos del PDF y del usuario
+  const updateData = (pdf: PDFData, user: UserData) => {
+    setPdfData(pdf);
+    setUserData(user);
+  };
+
+  // Función que maneja la generación del PDF
+  const generatePDF = async () => {
+    if (!pdfData || !userData) {
+      console.error("Datos incompletos: es necesario tener pdfData y userData.");
+      return;
+    }
+
+    try {
+      // Mostrar los datos del usuario antes de generar el PDF
+      console.log(`Generando PDF para el usuario: ${userData.name}, Email: ${userData.email}`);
+      
+      // Generación del PDF (aquí podrías integrar la librería de PDF que usas)
+      const blob = await pdf(<PDFDocument data={pdfData} />).toBlob(); // Reemplazar con tu librería de PDF
       const blobUrl = URL.createObjectURL(blob);
       window.open(blobUrl, "_blank");
-    } else {
-      console.error('No data available for PDF generation');
-    }
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    // Validar que los datos sean correctos según el esquema de zod
-    const result = formSchema.safeParse(pdfData);
-    if (result.success) {
-      handleGenerate();
-    } else {
-      // Aquí puedes manejar los errores de validación
-      console.error(result.error.format());
+    } catch (error) {
+      console.error("Error generando el PDF:", error);
     }
   };
 
   return (
     <div>
-      <h1>Formulario para Generar PDF</h1>
-      <form onSubmit={handleSubmit}>
-        <input
-          type="text"
-          placeholder="Business Name"
-          value={pdfData.buissnessName}
-          onChange={(e) => setPdfData({ ...pdfData, buissnessName: e.target.value })}
-        />
-        <input
-          type="text"
-          placeholder="Business Street"
-          value={pdfData.buissnessStreet}
-          onChange={(e) => setPdfData({ ...pdfData, buissnessStreet: e.target.value })}
-        />
-        {/* Otros campos de formulario */}
-        
-        <button type="submit">Generar PDF</button>
-      </form>
+      <button
+        className="bg-blue-500 text-white rounded-md p-2 hover:bg-blue-600 w-full"
+        onClick={generatePDF}
+      >
+        Generar PDF
+      </button>
+
+      {/* Ejemplo de botón para actualizar los datos */}
+      <button
+        onClick={() =>
+          updateData(
+            {
+              buissnessName: 'Mi Empresa',
+              buissnessStreet: 'Calle Ficticia 123',
+              buissnessCity: 'Ciudad Ejemplo',
+              buissnessPostal: '12345',
+              buissnessPhone: '555-1234',
+              clientName: 'Cliente Ejemplo',
+              clientStreet: 'Calle Cliente 456',
+              clientCity: 'Ciudad Cliente',
+              clientPostal: '67890',
+              date: '2025-05-01'
+            },
+            { name: 'Juan Pérez', email: 'juan@example.com' }
+          )
+        }
+      >
+        Actualizar Datos
+      </button>
+
+      {/* Mostrar los datos del usuario */}
+      {userData && (
+        <div>
+          <h3>Datos del Usuario:</h3>
+          <p>Nombre: {userData.name}</p>
+          <p>Email: {userData.email}</p>
+        </div>
+      )}
     </div>
   );
 };
 
-export default App;
+export default YourComponent;
