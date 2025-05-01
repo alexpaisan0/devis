@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-// Aquí puedes definir el tipo de datos de tu PDF
+// Tipo de datos para el PDF
 type PDFData = {
   buissnessName: string;
   buissnessStreet: string;
@@ -16,20 +16,30 @@ type PDFData = {
   date?: string;
 };
 
+// Valor por defecto en caso de que no haya datos
+const defaultPDFData: PDFData = {
+  buissnessName: '',
+  buissnessStreet: '',
+  buissnessCity: '',
+  buissnessPostal: '',
+  buissnessPhone: '',
+  clientName: '',
+  clientStreet: '',
+  clientCity: '',
+  clientPostal: '',
+  clientPhone: '',
+  clientEmail: '',
+  date: ''
+};
+
 const MyComponent = () => {
-  // Inicializamos el estado permitiendo que pdfData sea null
-  const [pdfData, setPdfData] = useState<PDFData | null>(null);
+  // Asegúrate de que pdfData siempre tenga un valor válido
+  const [pdfData, setPdfData] = useState<PDFData>(defaultPDFData);
 
-  // Función que genera el PDF
+  // Función para generar el PDF
   const generatePDF = async () => {
-    // Verificación para asegurarse de que pdfData no sea null
-    if (!pdfData) {
-      console.error("Error: Los datos del PDF no están completos.");
-      return;
-    }
-
     try {
-      // Aquí, pdfData es seguro para usar
+      // Pasa pdfData al componente PDFDocument
       const blob = await pdf(<PDFDocument data={pdfData} />).toBlob();
       const blobUrl = URL.createObjectURL(blob);
       window.open(blobUrl, "_blank");
@@ -50,7 +60,7 @@ const MyComponent = () => {
   );
 };
 
-// Asegúrate de tener tu componente PDFDocument correctamente definido
+// Componente PDFDocument
 const PDFDocument: React.FC<{ data: PDFData }> = ({ data }) => {
   return (
     <div>
