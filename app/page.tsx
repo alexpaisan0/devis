@@ -368,6 +368,7 @@ T
                         type="submit"
                         className="bg-blue-500 text-white rounded-md p-2 hover:bg-blue-600 w-full"
                         onClick={async () => {
+                          if (!pdfData) return;
                           const blob = await pdf(<PDFDocument data={pdfData} />).toBlob();
                           const blobUrl = URL.createObjectURL(blob);
                           window.open(blobUrl, "_blank");
