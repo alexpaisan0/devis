@@ -96,10 +96,7 @@ function PDFDocument({ data }: { data: z.infer<typeof formSchema> }) {
           <Text>{data.description}</Text>
         </View>
 
-        <View style={styles.section}>
-          <Text style={styles.bold}>Total à payer:</Text>
-          <Text>{data.price} €</Text>
-        </View>
+       
 
         {data.note && (
           <View style={styles.section}>
@@ -114,6 +111,11 @@ function PDFDocument({ data }: { data: z.infer<typeof formSchema> }) {
             <Text>{data.conditions}</Text>
           </View>
         )}
+
+         <View style={styles.section}>
+          <Text style={styles.bold}>Total à payer:</Text>
+          <Text>{data.price} €</Text>
+        </View>
 
         <View style={styles.section}>
           <Text style={styles.bold}>Date:</Text>
