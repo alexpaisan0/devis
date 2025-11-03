@@ -103,7 +103,7 @@ function PDFDocument({ data }: { data: z.infer<typeof formSchema> }) {
 
         {data.note && (
           <View style={styles.section}>
-            <Text style={styles.bold}>Prix:</Text>
+            <Text style={styles.bold}>Note:</Text>
             <Text>{data.note}</Text>
           </View>
         )}
