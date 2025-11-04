@@ -105,17 +105,20 @@ function PDFDocument({ data }: { data: z.infer<typeof formSchema> }) {
           </View>
         )}
 
+
+        <View style={styles.section}>
+          <Text style={styles.bold}>Total à payer:</Text>
+          <Text>{data.price} €</Text>
+        </View>
+
         {data.conditions && (
           <View style={styles.section}>
-            <Text style={styles.bold}>Conditions:</Text>
+            <Text style={styles.bold}>Conditions de paiement:</Text>
             <Text>{data.conditions}</Text>
           </View>
         )}
 
-         <View style={styles.section}>
-          <Text style={styles.bold}>Total à payer:</Text>
-          <Text>{data.price} €</Text>
-        </View>
+         
 
         <View style={styles.section}>
           <Text style={styles.bold}>Date:</Text>
