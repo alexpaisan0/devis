@@ -87,12 +87,12 @@ function PDFDocument({ data }: { data: z.infer<typeof formSchema> }) {
         </View>
 
         <View style={styles.section}>
-          <Text style={styles.bold}>Description du travail:</Text>
+          <Text style={styles.bold}>Travaux à réaliser:</Text>
           <Text>{data.job}</Text>
         </View>
 
         <View style={styles.section}>
-          <Text style={styles.bold}>Détails:</Text>
+          <Text style={styles.bold}>Description du travail:</Text>
           <Text>{data.description}</Text>
         </View>
 
